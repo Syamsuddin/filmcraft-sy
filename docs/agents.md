@@ -85,8 +85,9 @@ wrapped, colour chosen for contrast), narration on A1 (the scene is never shorte
 transitions between scenes. It returns the clip ids of every scene for further edits. The Claude
 Code skill [`.claude/skills/prompt-to-video`](../.claude/skills/prompt-to-video/SKILL.md) wraps it:
 storyboard → `storyboard.build` (or per-clip commands for media, shapes and motion) →
-`render_frame` checks → export. FilmCraft composes, it does not synthesize footage, and the
-narration voices are English.
+`render_frame` checks → export. FilmCraft composes, it does not synthesize footage. Narration is
+English, or Indonesian through the `kokoro-id-*` voices. State and next steps:
+[prompt-to-video.md](prompt-to-video.md).
 
 ### Conventions
 

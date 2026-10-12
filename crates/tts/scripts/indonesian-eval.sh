@@ -14,6 +14,9 @@ VOICES=("${@:-kokoro-id-heart kokoro-id-michael}")
 VOICES=(${VOICES[@]})
 mkdir -p "$OUT"
 cd "$REPO"
+# models go to a known place on every OS (FilmCraft reads FILMCRAFT_DATA_DIR)
+export FILMCRAFT_DATA_DIR="$OUT/data"
+KDIR="$FILMCRAFT_DATA_DIR/models"
 
 code=$(curl -sS -o /dev/null -w "%{http_code}" -m 20 -r 0-10 -L \
   https://huggingface.co/hexgrad/Kokoro-82M/resolve/f3ff3571791e39611d31c381e3a41a3af07b4987/config.json || true)
@@ -21,14 +24,14 @@ if [ "$code" != "200" ] && [ "$code" != "206" ]; then
   echo "huggingface.co is still blocked (HTTP $code): allow it in the environment's network settings."; exit 3
 fi
 
-target/release/filmcraft-cli exec tts.downloadVoices '{"wait":true}' >/dev/null
+# download and its job report in one process (a job lives in the session that started it)
+dl=$(printf '%s\n' '{"id":"tts.downloadVoices","params":{"wait":true}}' '{"id":"jobs.list","params":{}}' \
+  | target/release/filmcraft-cli run - --compact)
 installed=$(target/release/filmcraft-cli exec tts.voices --compact | python3 -c "import json,sys;print(json.load(sys.stdin)['package']['installed'])")
 if [ "$installed" != "True" ]; then
-  target/release/filmcraft-cli exec jobs.list --compact; echo "Kokoro download failed"; exit 4
+  echo "$dl"; echo "Kokoro download failed"; exit 4
 fi
-KOKORO=$(find "$HOME" / -type d -name kokoro-82m -path "*models*" 2>/dev/null | head -1)
-KDIR=$(dirname "$KOKORO")
-echo "Kokoro package: $KOKORO"
+echo "Kokoro package: $KDIR/kokoro-82m"
 
 # Whisper small, from the pins in crates/speech/src/models.rs
 WDIR="$OUT/whisper-small"; mkdir -p "$WDIR"
