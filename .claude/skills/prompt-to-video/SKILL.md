@@ -48,6 +48,33 @@ language of narration).
 
 ## Step 2: build
 
+### The quick way: `storyboard.build`
+
+One command turns the storyboard into a sequence: per scene a full-frame background (V1), a bold
+title (V2) and body text (V3), centred and wrapped, text colour picked for contrast, narration on
+A1, and transitions between scenes. A scene is never shorter than its narration; the whole build
+is one undo step and is rolled back if any part fails.
+
+```json
+{"id":"storyboard.build","params":{
+  "name":"Air Putih","width":1080,"height":1920,"fps":30,
+  "voice":"basic-female","dir":"<output folder>/narration",
+  "transition":"Cross Dissolve","transitionFrames":15,
+  "scenes":[
+    {"seconds":4,"background":"#0a3d62","title":"3 Manfaat Minum Air Putih","narration":"Three benefits of drinking water."},
+    {"seconds":5,"background":"#38ada9","title":"1. Menjaga konsentrasi","text":"Otak terdiri dari sekitar 75 persen air.","narration":"One. It keeps you focused."}
+  ]}}
+```
+
+Scene keys: `seconds` (0.5–600, default 4), `background`, `title`, `text`, `color` (text, else
+automatic), `narration`, `voice`; unknown keys are refused. `transition: "none"` gives cuts. The
+result lists each scene's `start`, `frames` and clip ids (`background`, `title`, `text`,
+`narration`). Use them to restyle with `graphics.set` (`font`, `size`, `shadow`, …) or add things
+on top. Use the manual way below only for what it cannot do: user media, shapes, keyframed motion,
+or adding to an existing sequence.
+
+### The manual way
+
 Time is in ticks: **254 016 000 000 ticks per second** (`time` params). Durations of graphics are
 `seconds`. Video track `track` is a 0-based index (0 = V1 background, 1 = V2 text, 2 = V3 extras);
 narration `track` is `"A1"`.
@@ -89,7 +116,8 @@ Notes learned the hard way:
 With MCP, send each scene as one `command_batch` (`stop_on_error: true`). With the CLI, write the
 steps to a `.jsonl` file and run
 `filmcraft-cli run scene.jsonl --compact --save-as <out>/video.fcproj`, then later passes with
-`--project <out>/video.fcproj --save`. A worked example is in `example.jsonl` next to this file.
+`--project <out>/video.fcproj --save`. A worked example of the manual way is in `example.jsonl` next to
+this file.
 
 ## Step 3: look before you export
 

@@ -79,11 +79,13 @@ claude mcp add filmcraft -- filmcraft-cli mcp
 Typical loop: `project_inspect` / `sequence_inspect` → get ids → `command_run` → `render_frame` or
 `ui_screenshot` → look at the result → `edit.undo` if it's wrong.
 
-**Video from a prompt.** The Claude Code skill
-[`.claude/skills/prompt-to-video`](../.claude/skills/prompt-to-video/SKILL.md) applies this loop to
-"make me a video about …": storyboard → shapes, text and narration per scene → transitions by clip
-id → `render_frame` checks → export. It works over MCP or `filmcraft-cli run`; `example.jsonl` there
-builds a four-scene narrated video. FilmCraft composes, it does not synthesize footage, and the
+**Video from a prompt.** `storyboard.build` makes a whole titled, narrated sequence from a list of
+scenes in one undoable command: per scene a full-frame background, a title and body text (centred,
+wrapped, colour chosen for contrast), narration on A1 (the scene is never shorter than it), and
+transitions between scenes. It returns the clip ids of every scene for further edits. The Claude
+Code skill [`.claude/skills/prompt-to-video`](../.claude/skills/prompt-to-video/SKILL.md) wraps it:
+storyboard → `storyboard.build` (or per-clip commands for media, shapes and motion) →
+`render_frame` checks → export. FilmCraft composes, it does not synthesize footage, and the
 narration voices are English.
 
 ### Conventions
