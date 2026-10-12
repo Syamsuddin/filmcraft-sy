@@ -39,7 +39,7 @@ pub const SYMBOLS: &str = "ˈˌ ɑæəʌɔɛɚɜɪʊiunAIOWYbʧdðfɡhʤklmŋpɹ
 
 /// Punctuation the normalizer may emit that is kept in phoneme output; anything
 /// else (apostrophes, stray symbols) is dropped.
-const KEPT_PUNCT: [char; 11] = [',', '.', '!', '?', ';', ':', '—', '…', '(', ')', '"'];
+pub(crate) const KEPT_PUNCT: [char; 11] = [',', '.', '!', '?', ';', ':', '—', '…', '(', ')', '"'];
 
 /// A pronunciation dictionary in CMUdict format.
 #[derive(Clone, Debug, Default)]
@@ -253,7 +253,7 @@ pub fn phonemize(text: &str, lang: Lang, lex: &Lexicon, overrides: &Overrides) -
 /// The bounded view of the user's overrides: keys lowercased, at most
 /// [`MAX_OVERRIDES`] entries of at most [`MAX_OVERRIDE_LEN`] chars — excess is
 /// ignored, not an error.
-fn bounded_overrides(overrides: &Overrides) -> BTreeMap<String, String> {
+pub(crate) fn bounded_overrides(overrides: &Overrides) -> BTreeMap<String, String> {
     let mut out = BTreeMap::new();
     for (word, value) in overrides.0.iter() {
         if out.len() >= MAX_OVERRIDES {
@@ -297,7 +297,7 @@ fn flush_sentence(sentence: &mut Vec<Token>, chunks: &mut Vec<Chunk>, lex: &Lexi
 
 /// Split a phoneme string longer than [`MAX_CHUNK_CHARS`] at the last `,` `;` `:`
 /// before the limit, else at the last space, else hard-split at the limit.
-fn split_long_chunk(s: String) -> Vec<String> {
+pub(crate) fn split_long_chunk(s: String) -> Vec<String> {
     if s.chars().count() <= MAX_CHUNK_CHARS {
         return vec![s];
     }
@@ -387,7 +387,7 @@ fn word_phonemes(word: &str, lex: &Lexicon, overrides: Option<&BTreeMap<String, 
 
 /// A raw-phoneme override `/…/`: strip the slashes and accept it only when every
 /// character is in [`SYMBOLS`]; otherwise fall through to the respelling path.
-fn raw_override(value: &str) -> Option<String> {
+pub(crate) fn raw_override(value: &str) -> Option<String> {
     let inner = value.strip_prefix('/')?.strip_suffix('/')?;
     if inner.is_empty() || !inner.chars().all(is_output_char) {
         return None;

@@ -50,7 +50,11 @@ builds), e.g. 186 s of speech in 84 s; model load 0.5 s. Reproduce with the `nar
 
 - The built-in voices are **robotic** and nearly unintelligible to a recogniser (above); they are
   the no-download fallback and the test voice.
-- English (United States) only. Words outside CMUdict go through letter-to-sound rules and are
+- English (United States), plus **Indonesian** read by three of the natural voices
+  (`kokoro-id-heart`, `kokoro-id-bella`, `kokoro-id-michael`: the same voice packs fed by
+  `filmcraft-tts-text`'s `indonesian` front end). Kokoro has no Indonesian voices, so they speak
+  with an American accent; their quality has not been measured yet. The built-in voices are English
+  only. English words outside CMUdict go through letter-to-sound rules and are
   often mispronounced (see `crates/tts-text/README.md`); homographs take the first pronunciation.
 - About 2× faster than real time on the CPU: a one-minute narration takes about 30 s. The UI runs
   synthesis as a background job.

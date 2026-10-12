@@ -122,8 +122,9 @@ pub trait Voice: Send + Sync {
     fn synthesize(&self, text: &str, params: &Params) -> Result<Audio, TtsError>;
 }
 
-/// Languages offered (English only for now).
-pub const LANGUAGES: &[(&str, &str)] = &[("en-US", "English (United States)")];
+/// Languages offered. Indonesian is spoken only by the natural voices (through
+/// `filmcraft_tts_text::indonesian`); the built-in voices are English.
+pub const LANGUAGES: &[(&str, &str)] = &[("en-US", "English (United States)"), ("id-ID", "Bahasa Indonesia")];
 
 /// Every voice FilmCraft knows: the built-in voices, then the neural voices (installed when their
 /// package is downloaded into `models_dir`).
@@ -168,8 +169,16 @@ pub fn default_voice_id() -> &'static str {
     formant::VOICES.first().map(|v| v.info.id).unwrap_or("basic-female")
 }
 
-/// The sentence "Hear this voice" plays.
+/// The sentence "Hear this voice" plays (English voices).
 pub const SAMPLE_SENTENCE: &str = "Hello! This is how I sound when I read your script.";
+
+/// The sentence "Hear this voice" plays for a voice of `language` (a BCP 47 tag).
+pub fn sample_sentence(language: &str) -> &'static str {
+    match language {
+        "id-ID" => "Halo! Beginilah suara saya saat membacakan naskah Anda.",
+        _ => SAMPLE_SENTENCE,
+    }
+}
 
 /// Validate a script before synthesis: length, and that it says something.
 pub fn check_text(text: &str) -> Result<(), TtsError> {
@@ -209,6 +218,16 @@ mod tests {
             Params { semitones: f64::INFINITY, ..Default::default() },
         ] {
             assert!(p.check().is_err(), "{p:?}");
+        }
+    }
+
+    #[test]
+    fn every_language_has_a_sample_sentence() {
+        assert_eq!(sample_sentence("en-US"), SAMPLE_SENTENCE);
+        assert!(sample_sentence("id-ID").starts_with("Halo"));
+        assert_eq!(sample_sentence("xx"), SAMPLE_SENTENCE);
+        for (lang, _) in LANGUAGES {
+            assert!(check_text(sample_sentence(lang)).is_ok(), "{lang}");
         }
     }
 

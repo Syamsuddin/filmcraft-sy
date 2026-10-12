@@ -183,7 +183,7 @@ fn peek(s: &str, i: usize) -> Option<char> {
 
 /// `[pause 1s]`, `[pause 500ms]`, `[pause 1.5s]` → a capped pause. Malformed markers
 /// return `None` and fall through to plain text (never an error).
-fn parse_pause(rest: &str) -> Option<(u32, usize)> {
+pub(crate) fn parse_pause(rest: &str) -> Option<(u32, usize)> {
     let close = rest.find(']')?;
     let inner = rest.get(1..close)?.trim();
     let value = inner.strip_prefix("pause")?;

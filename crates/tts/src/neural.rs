@@ -1,6 +1,7 @@
-//! The neural voices (feature `kokoro`): a script goes through the text front end
-//! (`filmcraft-tts-text`: normalizer, CMUdict + letter-to-sound, chunks of at most 400 phonemes
-//! and pause markers), each chunk through Kokoro-82M, pauses become exact silence, and the vocal
+//! The neural voices (feature `kokoro`): a script goes through the text front end of the voice's
+//! language (`filmcraft-tts-text`: for English the normalizer and CMUdict + letter-to-sound, for
+//! Indonesian `indonesian`'s reading and spelling rules; chunks of at most 400 phonemes and pause
+//! markers), each chunk through Kokoro-82M, pauses become exact silence, and the vocal
 //! pitch is applied afterwards with the pitch shifter from `filmcraft-audio-dsp` (Kokoro has no
 //! pitch control). Pace is Kokoro's speed. The model, the dictionary and voice packs are loaded
 //! once per package directory and shared.
@@ -73,7 +74,11 @@ impl Voice for NeuralVoice {
     fn synthesize(&self, text: &str, params: &Params) -> Result<Audio, TtsError> {
         check_text(text)?;
         params.check()?;
-        let chunks = filmcraft_tts_text::phonemize(text, Lang::EnUs, &self.lexicon, &Overrides::default()).map_err(|e| TtsError::Invalid(e.to_string()))?;
+        let chunks = match self.info.language {
+            "id-ID" => filmcraft_tts_text::indonesian::phonemize(text, &Overrides::default()),
+            _ => filmcraft_tts_text::phonemize(text, Lang::EnUs, &self.lexicon, &Overrides::default()),
+        }
+        .map_err(|e| TtsError::Invalid(e.to_string()))?;
         let rate = KOKORO_RATE;
         let max = (MAX_SECONDS * f64::from(rate)) as usize;
         let mut out: Vec<f32> = Vec::new();

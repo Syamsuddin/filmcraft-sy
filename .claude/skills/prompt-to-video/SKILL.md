@@ -16,10 +16,15 @@ keyframes, and anything built from the user's own images, video and audio. It ca
 photoreal scenes ("a man walking on a beach"). If the prompt needs that, say so up front and offer
 a text/graphics version or ask for footage.
 
-Narration voices (`tts.voices`) are **English**: `basic-female`, `basic-male` (built in), and the
-Kokoro neural voices `kokoro-*` (better, but `tts.downloadVoices` must fetch ~336 MB first, after the
-user agrees). For other languages, warn that narration will sound off, and offer on-screen text
-only, English narration, or the user's own recorded voice-over (`media_import`).
+Narration voices (`tts.voices`): `basic-female`, `basic-male` (built in, English, robotic) and the
+Kokoro natural voices, which need `tts.downloadVoices` to fetch ~336 MB once (ask the user first;
+it needs a FilmCraft built with natural voices, `neural-voices`). English: `kokoro-heart`,
+`kokoro-bella`, `kokoro-michael`, …. **Indonesian:** `kokoro-id-heart`, `kokoro-id-bella`,
+`kokoro-id-michael`. Write their narration in normal Indonesian: numbers, `Rp 15.000`, `75%` and
+`ke-2` are read in Indonesian. They speak with an American accent (Kokoro has no Indonesian voice).
+Fix a word that comes out wrong by writing é where it is said (`meréka`) or spelling it as it
+sounds. Without the download, offer on-screen text only, or the user's own voice-over
+(`media_import`). For other languages, say narration is not available.
 
 ## Step 0: make sure the tool is there
 
@@ -29,9 +34,13 @@ Two routes, same engine and same commands:
   `sequence_inspect`, `media_import`. Server `filmcraft-headless` in `.mcp.json`.
 - **CLI** (always works): `target/release/filmcraft-cli`.
 
-If `target/release/filmcraft-cli` is missing, build it (about 5 minutes):
-`cargo build --release -p filmcraft-cli`. The MCP servers only connect after it exists (reconnect
-with `/mcp` or restart the session); until then use the CLI.
+If `target/release/filmcraft-cli` is missing, build it: `cargo build --release -p filmcraft-cli`
+(about 5 minutes), or with the natural voices (needed for Indonesian narration; about 11 minutes)
+`cargo build --release -p filmcraft-cli --features neural-voices`. Then download the voices once
+with `tts.downloadVoices` (`wait: true`) and check `jobs.list`: the download needs huggingface.co
+and raw.githubusercontent.com, and a sandbox that blocks them fails with a proxy error. Tell the
+user the host was blocked rather than falling back silently. The MCP servers only connect after the
+binary exists (reconnect with `/mcp` or restart the session); until then use the CLI.
 
 Before using a command you have not used in this session, check its params:
 `filmcraft-cli describe <id> --compact` (or MCP `command_list` with `filter`). Params change; trust
@@ -58,11 +67,11 @@ is one undo step and is rolled back if any part fails.
 ```json
 {"id":"storyboard.build","params":{
   "name":"Air Putih","width":1080,"height":1920,"fps":30,
-  "voice":"basic-female","dir":"<output folder>/narration",
+  "voice":"kokoro-id-heart","dir":"<output folder>/narration",
   "transition":"Cross Dissolve","transitionFrames":15,
   "scenes":[
-    {"seconds":4,"background":"#0a3d62","title":"3 Manfaat Minum Air Putih","narration":"Three benefits of drinking water."},
-    {"seconds":5,"background":"#38ada9","title":"1. Menjaga konsentrasi","text":"Otak terdiri dari sekitar 75 persen air.","narration":"One. It keeps you focused."}
+    {"seconds":4,"background":"#0a3d62","title":"3 Manfaat Minum Air Putih","narration":"Tiga manfaat minum air putih."},
+    {"seconds":5,"background":"#38ada9","title":"1. Menjaga konsentrasi","text":"Otak terdiri dari sekitar 75 persen air.","narration":"Pertama, air menjaga konsentrasi. Otak kita 75% air."}
   ]}}
 ```
 
