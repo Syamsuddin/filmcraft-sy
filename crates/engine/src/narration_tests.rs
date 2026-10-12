@@ -423,3 +423,24 @@ fn unique_wav_path_gives_up_instead_of_looping_forever() {
     }
     assert!(crate::voiceover::unique_wav_path(&s, "/nonexistent-dir", "Narration").is_err());
 }
+
+#[test]
+fn indonesian_is_offered_through_the_natural_voices() {
+    let mut s = demo();
+    let v = s.execute("tts.voices", json!({})).unwrap();
+    let langs: Vec<&str> = v["languages"].as_array().unwrap().iter().map(|l| l["id"].as_str().unwrap()).collect();
+    assert_eq!(langs, ["en-US", "id-ID"]);
+    let indonesian: Vec<&Value> = v["voices"].as_array().unwrap().iter().filter(|x| x["language"] == "id-ID").collect();
+    assert_eq!(indonesian.len(), 3, "{indonesian:?}");
+    assert!(indonesian.iter().all(|x| x["engine"] == "neural" && x["id"].as_str().unwrap().starts_with("kokoro-id-")));
+    // the narration records the voice's language; without the package it says what is missing
+    let n = crate::narration::sample_settings("tts.preview", &json!({"voice": "kokoro-id-heart", "sample": true}), None).unwrap();
+    assert_eq!(n.language, "id-ID");
+    assert_eq!(n.text, filmcraft_tts::sample_sentence("id-ID"));
+    let en = crate::narration::sample_settings("tts.preview", &json!({"voice": "basic-male", "sample": true}), None).unwrap();
+    assert_eq!((en.language.as_str(), en.text.as_str()), ("en-US", filmcraft_tts::SAMPLE_SENTENCE));
+    if !v["package"]["installed"].as_bool().unwrap() {
+        let e = s.execute("tts.create", json!({"text": "Selamat pagi.", "voice": "kokoro-id-heart"})).unwrap_err().to_string();
+        assert!(e.contains("download") || e.contains("not available"), "{e}");
+    }
+}

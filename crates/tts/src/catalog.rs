@@ -71,11 +71,14 @@ const NEURAL_LICENSE: &str = "Apache-2.0 (Kokoro-82M by hexgrad)";
 
 macro_rules! voice {
     ($id:literal, $name:literal, $gender:ident, $file:literal, $desc:literal) => {
+        voice!($id, $name, "en-US", $gender, $file, $desc)
+    };
+    ($id:literal, $name:literal, $lang:literal, $gender:ident, $file:literal, $desc:literal) => {
         NeuralVoice {
             info: VoiceInfo {
                 id: $id,
                 name: $name,
-                language: "en-US",
+                language: $lang,
                 gender: Gender::$gender,
                 engine: "neural",
                 description: $desc,
@@ -87,7 +90,7 @@ macro_rules! voice {
     };
 }
 
-/// US English voices the model card grades C+ or better, best first.
+/// US English voices the model card grades C+ or better, best first, then the Indonesian readers.
 pub static VOICES: &[NeuralVoice] = &[
     voice!("kokoro-heart", "Heart", Female, "af_heart.pt", "Natural voice, warm (model card grade A)."),
     voice!("kokoro-bella", "Bella", Female, "af_bella.pt", "Natural voice, bright (grade A−)."),
@@ -98,6 +101,12 @@ pub static VOICES: &[NeuralVoice] = &[
     voice!("kokoro-aoede", "Aoede", Female, "af_aoede.pt", "Natural voice (grade C+)."),
     voice!("kokoro-kore", "Kore", Female, "af_kore.pt", "Natural voice (grade C+)."),
     voice!("kokoro-sarah", "Sarah", Female, "af_sarah.pt", "Natural voice (grade C+)."),
+    // Indonesian: the same voice packs reading phonemes from the Indonesian front end
+    // (`filmcraft_tts_text::indonesian`). Kokoro has no Indonesian voices, so they keep an
+    // American accent; no extra download.
+    voice!("kokoro-id-heart", "Heart", "id-ID", Female, "af_heart.pt", "Natural voice reading Indonesian, warm; with an American accent."),
+    voice!("kokoro-id-bella", "Bella", "id-ID", Female, "af_bella.pt", "Natural voice reading Indonesian, bright; with an American accent."),
+    voice!("kokoro-id-michael", "Michael", "id-ID", Male, "am_michael.pt", "Natural voice reading Indonesian; with an American accent."),
 ];
 
 pub fn find(id: &str) -> Option<&'static NeuralVoice> {
@@ -144,6 +153,7 @@ mod tests {
         }
         for v in VOICES {
             assert!(FILES.iter().any(|f| f.name == v.file), "{} has no file", v.info.id);
+            assert!(crate::LANGUAGES.iter().any(|(l, _)| *l == v.info.language), "{}: language {} not offered", v.info.id, v.info.language);
             assert_eq!(find(v.info.id).map(|x| x.file), Some(v.file));
         }
         assert!(size() > 330_000_000 && size() < 340_000_000, "{}", size());

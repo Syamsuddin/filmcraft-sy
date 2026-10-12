@@ -87,6 +87,20 @@ fn settings(cmd: &str, p: &Value, base: Option<&Narration>) -> Result<Narration>
     Ok(n)
 }
 
+/// [`settings`], with `sample: true` reading the voice's sample sentence in the voice's language
+/// ("Hear this voice") instead of the script.
+pub(crate) fn sample_settings(cmd: &str, p: &Value, base: Option<&Narration>) -> Result<Narration> {
+    let sample = p.get("sample").and_then(Value::as_bool).unwrap_or(false);
+    if !sample {
+        return settings(cmd, p, base);
+    }
+    let mut q = p.clone();
+    q["text"] = json!(tts::SAMPLE_SENTENCE);
+    let mut n = settings(cmd, &q, base)?;
+    n.text = tts::sample_sentence(&n.language).to_string();
+    Ok(n)
+}
+
 /// Synthesized narrations by settings, newest last (`tts.render` fills it in the background so
 /// the UI's create / edit / preview don't block).
 pub type SynthCache = Arc<Mutex<Vec<(String, Arc<tts::Audio>)>>>;
@@ -159,11 +173,7 @@ fn voices(_s: &mut Session, _p: &Value) -> Result<Value> {
 fn preview(s: &mut Session, p: &Value) -> Result<Value> {
     let cmd = "tts.preview";
     let base = target_clip(s, p).and_then(|c| s.active_sequence()?.find_item(c).map(|(_, it)| it.item)).and_then(|i| s.project.narrations.get(&i).cloned());
-    let mut q = p.clone();
-    if q.get("sample").and_then(Value::as_bool).unwrap_or(false) {
-        q["text"] = json!(tts::SAMPLE_SENTENCE);
-    }
-    let n = settings(cmd, &q, base.as_ref())?;
+    let n = sample_settings(cmd, p, base.as_ref())?;
     let audio = synthesize(s, cmd, &n)?;
     let seconds = audio.seconds();
     let samples = audio.samples.len();
@@ -418,11 +428,7 @@ fn finish(prog: &filmcraft_export::Progress, res: &JobResult, r: std::result::Re
 fn render_job(s: &mut Session, p: &Value) -> Result<Value> {
     let cmd = "tts.render";
     let base = target_clip(s, p).and_then(|c| s.active_sequence()?.find_item(c).map(|(_, it)| it.item)).and_then(|i| s.project.narrations.get(&i).cloned());
-    let mut q = p.clone();
-    if q.get("sample").and_then(Value::as_bool).unwrap_or(false) {
-        q["text"] = json!(tts::SAMPLE_SENTENCE);
-    }
-    let n = settings(cmd, &q, base.as_ref())?;
+    let n = sample_settings(cmd, p, base.as_ref())?;
     let key = cache_key(&n);
     if s.tts_cache.lock().unwrap_or_else(PoisonError::into_inner).iter().any(|(k, _)| *k == key) {
         return Ok(json!({"job": null, "cached": true}));

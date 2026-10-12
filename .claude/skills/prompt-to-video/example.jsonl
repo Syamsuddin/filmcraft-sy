@@ -1,0 +1,27 @@
+# prompt-to-video example: 4 scenes, 1280x720, 19 s. Pass 1 of 2 (transitions need clip ids: pass 2).
+# Run: filmcraft-cli run example.jsonl --compact --save-as OUT/video.fcproj   (replace OUT in "dir" first)
+{"id": "file.newSequence", "params": {"name": "Tips Hemat Listrik", "width": 1280, "height": 720, "fps": 30}}
+# Scene 1: 0-4 s
+{"id": "graphics.newRectangle", "params": {"position": [640, 360], "size": [1280, 720], "seconds": 4, "track": 0, "time": 0}}
+{"id": "graphics.set", "params": {"props": {"fill_color": "#0b2a4a"}}}
+{"id": "graphics.newText", "params": {"text": "3 Tips Hemat Listrik", "position": [640, 380], "size": 90, "seconds": 4, "track": 1, "time": 0}}
+{"id": "graphics.set", "params": {"props": {"align": "center", "fill_color": "#ffffff", "font_style": "Bold"}}}
+{"id": "tts.create", "params": {"text": "Three simple tips to save electricity.", "voice": "basic-female", "time": 0, "track": "A1", "dir": "OUT/narration"}}
+# Scene 2: 4-9 s
+{"id": "graphics.newRectangle", "params": {"position": [640, 360], "size": [1280, 720], "seconds": 5, "track": 0, "time": 1016064000000}}
+{"id": "graphics.set", "params": {"props": {"fill_color": "#f2b705"}}}
+{"id": "graphics.newText", "params": {"text": "1. Cabut charger yang tidak dipakai", "box": [1000, 300], "position": [140, 260], "size": 64, "seconds": 5, "track": 1, "time": 1016064000000}}
+{"id": "graphics.set", "params": {"props": {"align": "center", "fill_color": "#1a1a1a", "font_style": "Bold"}}}
+{"id": "tts.create", "params": {"text": "One. Unplug chargers you are not using.", "voice": "basic-female", "time": 1016064000000, "track": "A1", "dir": "OUT/narration"}}
+# Scene 3: 9-14 s
+{"id": "graphics.newRectangle", "params": {"position": [640, 360], "size": [1280, 720], "seconds": 5, "track": 0, "time": 2286144000000}}
+{"id": "graphics.set", "params": {"props": {"fill_color": "#1f7a4d"}}}
+{"id": "graphics.newText", "params": {"text": "2. Matikan lampu saat keluar ruangan", "box": [1000, 300], "position": [140, 260], "size": 64, "seconds": 5, "track": 1, "time": 2286144000000}}
+{"id": "graphics.set", "params": {"props": {"align": "center", "fill_color": "#ffffff", "font_style": "Bold"}}}
+{"id": "tts.create", "params": {"text": "Two. Switch off the lights when you leave a room.", "voice": "basic-female", "time": 2286144000000, "track": "A1", "dir": "OUT/narration"}}
+# Scene 4: 14-19 s
+{"id": "graphics.newRectangle", "params": {"position": [640, 360], "size": [1280, 720], "seconds": 5, "track": 0, "time": 3556224000000}}
+{"id": "graphics.set", "params": {"props": {"fill_color": "#c0392b"}}}
+{"id": "graphics.newText", "params": {"text": "3. Atur AC di suhu 25 derajat", "box": [1000, 300], "position": [140, 260], "size": 64, "seconds": 5, "track": 1, "time": 3556224000000}}
+{"id": "graphics.set", "params": {"props": {"align": "center", "fill_color": "#ffffff", "font_style": "Bold"}}}
+{"id": "tts.create", "params": {"text": "Three. Set the air conditioner to twenty five degrees.", "voice": "basic-female", "time": 3556224000000, "track": "A1", "dir": "OUT/narration"}}

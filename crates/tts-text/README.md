@@ -55,7 +55,8 @@ plain text, and all slicing is boundary-safe with `get()`.
 
 ## Limitations
 
-- English only (amended brief). Spanish was cut from this crate's scope.
+- English only in `normalize` / `phonemize` (amended brief). Spanish was cut from this crate's
+  scope. Indonesian has its own front end, `indonesian` (below).
 - No "and" in British cardinals; no British-ism beyond date order and £.
 - Pronunciation is not attempted here — this crate stops at spoken words.
 - Time hours 0–12 read as cardinals ("0:15" → "zero fifteen"), not "twelve".
@@ -161,10 +162,39 @@ dialog).
   word-final f; "ia"/"ea" ambiguities resolved to one value each.
 - The sentence terminator always becomes `.` (the normalizer collapses `!`/`?`
   into `SentenceEnd`).
-- English only.
+- English only (Indonesian: see `indonesian` below).
 
 ## References
 
 None (rules written from scratch). Clean-room: no G2P/TTS project source was
 read. Allowed sources used: CMUdict's own data and licence, published IPA
 charts, and Wikipedia's ARPAbet and English phonology pages.
+
+# Indonesian (`indonesian`)
+
+`indonesian::phonemize(script, overrides)` → the same `Chunk`s, for the Kokoro voices offered as
+Indonesian narrators (`kokoro-id-*` in `filmcraft-tts`). Kokoro has no Indonesian voices; it is fed
+Indonesian phonemes written with the symbols the English path already uses, so the American voice
+packs read Indonesian with an American accent. Written from scratch from the EYD spelling rules.
+
+- **Reading:** numbers in Indonesian words (`1.250` → seribu dua ratus lima puluh; dot thousands,
+  decimal comma or point → "koma" and digits; a leading zero or more than 15 digits digit by
+  digit), `%` → persen, `Rp 15.000` / `Rp15.000,-` → lima belas ribu rupiah, `ke-1` → pertama,
+  `ke-2` → kedua, `dll` / `dsb` / `dst` / `yg` / `dgn` / `tdk` / `utk` / `sdh` / `blm` / `tsb` /
+  `jl` / `no` / units (`kg`, `km`, `cm`, `mm`), acronyms of two to four capitals spelled with
+  Indonesian letter names (`KTP` → ka te pe; five or more are read as a word: `ASEAN`), `-` as a
+  word break (`anak-anak`), `[pause …]` markers as in English.
+- **Letters:** `ng` ŋ, `ny` n j (Kokoro has no ɲ), `sy` ʃ, `kh` h, `c` ʧ, `j` ʤ, `y` j, `r` ɹ,
+  `v` f, `q` k, `x` k s; doubled consonants once; `ai` / `au` / `oi` are diphthongs (I, W, Y) only at
+  the end of a word (`pantai`, `pulau`; `main` stays ma-in); `a` ɑ, `i` i, `u` u, `o` O.
+- **The letter e:** ə, except é (ɛ) when written `é`/`è`, word-final (`sate`), or before a final
+  `h`/`k` (`boleh`, `jelek`); about forty common words are respelled with é where it is said
+  (`mereka` → meréka, `persen` → persén, `meja`, `nenek`, `telepon`, …).
+- **Stress:** `ˈ` before the second-to-last vowel, or the last when the second-to-last is ə
+  (`kecil` → kəʧˈil); none on one-syllable words.
+- **Overrides:** the same pronunciation list as English; a value is an Indonesian respelling
+  (`telepon` → `télépon`) or raw phonemes between slashes.
+
+Limits: not measured by listening or recognition yet (the voice package could not be downloaded
+where this was written); affixed forms of the é words (`berbeda`) are not respelled; loanwords
+keep Indonesian letter rules; the accent is American.

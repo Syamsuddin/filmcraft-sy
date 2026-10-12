@@ -79,6 +79,16 @@ claude mcp add filmcraft -- filmcraft-cli mcp
 Typical loop: `project_inspect` / `sequence_inspect` → get ids → `command_run` → `render_frame` or
 `ui_screenshot` → look at the result → `edit.undo` if it's wrong.
 
+**Video from a prompt.** `storyboard.build` makes a whole titled, narrated sequence from a list of
+scenes in one undoable command: per scene a full-frame background, a title and body text (centred,
+wrapped, colour chosen for contrast), narration on A1 (the scene is never shorter than it), and
+transitions between scenes. It returns the clip ids of every scene for further edits. The Claude
+Code skill [`.claude/skills/prompt-to-video`](../.claude/skills/prompt-to-video/SKILL.md) wraps it:
+storyboard → `storyboard.build` (or per-clip commands for media, shapes and motion) →
+`render_frame` checks → export. FilmCraft composes, it does not synthesize footage. Narration is
+English, or Indonesian through the `kokoro-id-*` voices. State and next steps:
+[prompt-to-video.md](prompt-to-video.md).
+
 ### Conventions
 
 The server follows a few conventions that make it predictable for agents. They are not
